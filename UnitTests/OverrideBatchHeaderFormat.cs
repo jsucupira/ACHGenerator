@@ -13,7 +13,7 @@ public class OverrideBatchHeaderFormat
     {
         var generator = new ACHFileGenerator();
 
-        var batchHeader = new TrustBankBatchHeader
+        var batchHeader = new TrustMarkBankBatchHeader
         {
             BatchNumber = 0,
             ServiceCode = (int) ACHServiceCode.Debit,

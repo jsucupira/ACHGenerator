@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using ACHGenerator.CustomAttributes;
 using ACHGenerator.DTO;
 
@@ -9,8 +6,7 @@ namespace ACHGenerator
 {
     public class ACHFileGenerator
     {
-        private static readonly string FillerLine =
-            "9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
+        private const string FillerLine = "9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
 
         public char ImmidiateDestinationFiller { get; set; } = ' ';
         public char ImmidiateOriginFiller { get; set; } = ' ';
@@ -34,11 +30,7 @@ namespace ACHGenerator
                     : GenerateRecordLine(batchHeaderRecord.BatchControlRecord));
             }
 
-
-            if (transaction.FileControlRecord == null)
-            {
-                transaction.FileControlRecord = GenerateFileControlRecord(transaction);
-            }
+            transaction.FileControlRecord ??= GenerateFileControlRecord(transaction);
 
             var fillerLinesToAdd = CalculateFillerLines(transaction, achLines);
 
@@ -146,7 +138,9 @@ namespace ACHGenerator
                     Attribute = p.GetCustomAttributes(typeof(ACHField), true).FirstOrDefault() as ACHField
                 })
                 .Where(p => p.Attribute != null)
-                .OrderBy(p => p.Attribute?.Position);
+                .OrderBy(p => p.Attribute.Position)
+                .ToList();
+
             foreach (var recordProperty in recordProperties)
             {
                 var attribute = recordProperty.Attribute;
@@ -169,7 +163,7 @@ namespace ACHGenerator
                              "must have 'Format' attribute parameter since is currency.");
                         }
 
-                        var propertyValue = (decimal)property.GetValue(record);
+                        var propertyValue = (decimal)property.GetValue(record)!;
 
                         var valueAsString = propertyValue.ToString(attribute.Format);
 
@@ -198,7 +192,7 @@ namespace ACHGenerator
                     }
                     case "Int32":
                     {
-                        var propertyValue = (int)property.GetValue(record);
+                        var propertyValue = (int)property.GetValue(record)!;
 
                         var valueAsString = string.IsNullOrEmpty(attribute.Format)
                             ? propertyValue.ToString()
@@ -225,7 +219,7 @@ namespace ACHGenerator
                     }
                     case "Int64":
                         {
-                            var propertyValue = (long)property.GetValue(record);
+                            var propertyValue = (long)property.GetValue(record)!;
                             var valueAsString = string.IsNullOrEmpty(attribute.Format)
                                 ? propertyValue.ToString()
                                 : propertyValue.ToString(attribute.Format);
@@ -253,7 +247,7 @@ namespace ACHGenerator
                                                 $" '{record.GetType().Name}' is of 'DateTime' type and must contain a 'Format' attribute parameter.");
                         }
 
-                        var propertyValue = (DateTime)property.GetValue(record);
+                        var propertyValue = (DateTime)property.GetValue(record)!;
 
                         //All Date and Times must be formatted, apply formatting
                         recordLine = recordLine.Insert(attribute.Position - 1,
@@ -270,33 +264,36 @@ namespace ACHGenerator
                             propertyValue = string.Format(attribute.Format, propertyValue);
                         }
 
-                        if (propertyValue.Length > attribute.Length)
+                        if (propertyValue != null)
                         {
-                            throw new Exception($"Property '{property.Name}' in" +
-                                                $" '{record.GetType().Name}' has an invalid length, " +
-                                                $"should be ({attribute.Length}) and is ({propertyValue.Length}).");
-                        }
-
-                        while (propertyValue.Length < attribute.Length)
-                        {
-                            //If the length of the number string is less than the
-                            //required field length, post-pend with white space until correct length has been reached.
-                            //(Alphanumeric Rule)
-
-                            propertyValue = property.Name switch
+                            if (propertyValue.Length > attribute.Length)
                             {
-                                // Determine which filler to use based on the property name
-                                // Different banks have different rules for what filler to use
-                                nameof(FileHeader.ImmidiateOrigin) =>
-                                    propertyValue.Insert(0, ImmidiateOriginFiller.ToString()),
-                                nameof(FileHeader.ImmidiateDestination) =>
-                                    propertyValue.Insert(0, ImmidiateDestinationFiller.ToString()),
-                                _ =>
-                                    propertyValue.Insert(propertyValue.Length, " ")
-                            };
-                        }
+                                throw new Exception($"Property '{property.Name}' in" +
+                                                    $" '{record.GetType().Name}' has an invalid length, " +
+                                                    $"should be ({attribute.Length}) and is ({propertyValue.Length}).");
+                            }
 
-                        recordLine = recordLine.Insert(attribute.Position - 1, propertyValue);
+                            while (propertyValue.Length < attribute.Length)
+                            {
+                                //If the length of the number string is less than the
+                                //required field length, post-pend with white space until correct length has been reached.
+                                //(Alphanumeric Rule)
+
+                                propertyValue = property.Name switch
+                                {
+                                    // Determine which filler to use based on the property name
+                                    // Different banks have different rules for what filler to use
+                                    nameof(FileHeader.ImmidiateOrigin) =>
+                                        propertyValue.Insert(0, ImmidiateOriginFiller.ToString()),
+                                    nameof(FileHeader.ImmidiateDestination) =>
+                                        propertyValue.Insert(0, ImmidiateDestinationFiller.ToString()),
+                                    _ =>
+                                        propertyValue.Insert(propertyValue.Length, " ")
+                                };
+                            }
+
+                            recordLine = recordLine.Insert(attribute.Position - 1, propertyValue);
+                        }
 
                         break;
                     }

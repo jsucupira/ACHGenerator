@@ -287,6 +287,10 @@ namespace ACHGenerator
                                         propertyValue.Insert(0, ImmidiateOriginFiller.ToString()),
                                     nameof(FileHeader.ImmidiateDestination) =>
                                         propertyValue.Insert(0, ImmidiateDestinationFiller.ToString()),
+                                    nameof(BatchHeader.ODFIIdentification) =>
+                                        propertyValue.Insert(0, "0"),
+                                    nameof(EntryDetail.RDFIIdentification) =>
+                                        propertyValue.Insert(0, "0"),
                                     _ =>
                                         propertyValue.Insert(propertyValue.Length, " ")
                                 };
@@ -303,9 +307,13 @@ namespace ACHGenerator
             return recordLine;
         }
 
-        private long CalculateEntryHash(IEnumerable<EntryDetail> entryDetailRecords)
+        private static long CalculateEntryHash(IEnumerable<EntryDetail> entryDetailRecords)
         {
-            return entryDetailRecords.Sum(e => e.RDFIIdentification);
+            var convertRDFIIdentificationToLong = entryDetailRecords
+                .Select(e => e.RDFIIdentification)
+                .Select(r => Convert.ToInt64(r));
+
+            return convertRDFIIdentificationToLong.Sum(e => e);
         }
 
         private long CapHashToMaxSize(long hash)

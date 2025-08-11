@@ -24,7 +24,7 @@ public class OverrideBatchHeaderFormat
             CompanyEntryDescription = "Payroll",
             CompanyDescriptiveDate = new DateTime(2017, 9, 15, 12, 30, 15),
             EffectiveEntryDate = new DateTime(2017, 9, 16, 12, 30, 15),
-            ODFIIdentification = 123456
+            ODFIIdentification = "123456"
         };
 
         var line = generator.GenerateRecordLine(batchHeader);

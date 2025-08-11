@@ -82,7 +82,7 @@ namespace ACHGenerator.DTO
         protected string OriginatorStatusCode  { get; set; } =  "1";
 
         [ACHField(Position = 80, Length = 8)]
-        public int ODFIIdentification { get; set; }
+        public string ODFIIdentification { get; set; }
 
         [ACHField(Position = 88, Length = 7)]
         public int BatchNumber { get; set; }
@@ -97,7 +97,7 @@ namespace ACHGenerator.DTO
         public int TransactionCode { get; set; }
 
         [ACHField(Position = 4, Length = 8)]
-        public long RDFIIdentification { get; set; }
+        public string RDFIIdentification { get; set; }
 
         [ACHField(Position = 12, Length = 1)]
         public int CheckDigit { get; set; }
@@ -154,7 +154,7 @@ namespace ACHGenerator.DTO
         protected string Filler { get; set; } = "      ";
 
         [ACHField(Position = 80, Length = 8)]
-        public int ODFIIdentification { get; set; }
+        public string ODFIIdentification { get; set; }
 
         [ACHField(Position = 88, Length = 7)]
         public int BatchNumber { get; set; }

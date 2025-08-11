@@ -28,14 +28,14 @@ var achTransaction = new ACHTransaction
                 CompanyEntryDescription = "Payroll",
                 CompanyDescriptiveDate = DateTime.Today,
                 EffectiveEntryDate = DateTime.Today.AddDays(1),
-                ODFIIdentification = 123456
+                ODFIIdentification = "123456"
             },
             EntryDetailRecords = new List<EntryDetail>
             {
                 new()
                 {
                     TransactionCode = (int) ACHTransactionCode.DebitToChecking,
-                    RDFIIdentification = 123456,
+                    RDFIIdentification = "123456",
                     CheckDigit = 5,
                     DFIAccountNumber = "ABC123BA#",
                     Amount = (decimal) 1500.53,
@@ -46,7 +46,7 @@ var achTransaction = new ACHTransaction
                 new()
                 {
                     TransactionCode = (int) ACHTransactionCode.CreditToChecking,
-                    RDFIIdentification = 654231,
+                    RDFIIdentification = "654231",
                     CheckDigit = 1,
                     DFIAccountNumber = "DFIAccountNum",
                     Amount = (decimal) 1500.53,
@@ -57,7 +57,7 @@ var achTransaction = new ACHTransaction
                 new()
                 {
                     TransactionCode = (int) ACHTransactionCode.CreditToChecking,
-                    RDFIIdentification = 654231,
+                    RDFIIdentification = "654231",
                     CheckDigit = 1,
                     DFIAccountNumber = "DFIAccountNum",
                     Amount = (decimal) 1500.53,
@@ -68,7 +68,7 @@ var achTransaction = new ACHTransaction
                 new()
                 {
                     TransactionCode = (int) ACHTransactionCode.CreditToChecking,
-                    RDFIIdentification = 654231,
+                    RDFIIdentification = "654231",
                     CheckDigit = 1,
                     DFIAccountNumber = "DFIAccountNum",
                     Amount = (decimal) 1500.53,
